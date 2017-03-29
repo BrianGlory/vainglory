@@ -1,6 +1,8 @@
 import isArray from 'lodash/isArray';
 import util from 'util';
 
+import Asset from '../models/asset';
+import Players from '../models/players';
 import Player from '../models/player';
 import Matches from '../models/matches';
 import Match from '../models/match';
@@ -8,6 +10,8 @@ import Participant from '../models/participant';
 import Roster from '../models/roster';
 
 const map = {
+  asset: Asset,
+  players: Players,
   player: Player,
   matches: Matches,
   match: Match,
@@ -24,7 +28,7 @@ function getModel(entityType) {
   return model;
 }
 
-export default (entity, data, remapped) => {
+export default (entity, data) => {
 
   if (data === null) {
     return data;
@@ -68,6 +72,7 @@ export default (entity, data, remapped) => {
 
     return checkForRelations(modeledData, modeledData.data);
   }
+
 
   return checkForRelations(dataModel, parentData);
 

@@ -5,6 +5,11 @@ export default class BaseModel {
     this.relationships = null;
   }
 
+  set id(id) {
+    this.data.id = id;
+    return this;
+  }
+
   get type() {
     return this.data.type;
   }
@@ -15,5 +20,10 @@ export default class BaseModel {
 
   get raw() {
     return this.data;
+  }
+
+  extend(key, properties) {
+    this[key] = properties;
+    return this;
   }
 }

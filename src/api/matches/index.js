@@ -1,6 +1,7 @@
 import isString from 'lodash/isString';
 import parser from '../parser';
 import { normalizeError } from '../../Errors';
+import { encodePlayerNames } from '../../Utils';
 
 const ENDPOINT_PREFIX = 'matches';
 
@@ -17,12 +18,16 @@ export default (http) => {
     const endpoint = `${ENDPOINT_PREFIX}/${matchId}`;
     try {
       const response = await http.execute('GET', endpoint);
+      const { errors, messages } = response;
 
-      if (response.errors) {
-        return normalizeError(response.messages);
+      if (errors) {
+        return normalizeError(messages);
       }
 
-      return parser('match', response.body)
+      const model = parser('match', response.body);
+      model.extend('rateLimit', response.rateLimit);
+
+      return model;
     } catch (e) {
       return normalizeError(null, e);
     }
@@ -41,14 +46,21 @@ export default (http) => {
 
     const query = { ...defaults, ...collectionOptions };
 
+    if (query.filter.playerNames && query.filter.playerNames.length > 0) {
+      query.filter.playerNames = encodePlayerNames(query.filter.playerNames);
+    }
+
     try {
       const response = await http.execute('GET', `${ENDPOINT_PREFIX}`, query);
-      
-      if (response.errors) {
-        return normalizeError(response.messages);
-      }
+      const { errors, messages } = response;
 
-      return parser('matches', response.body);
+      if (errors) {
+        return normalizeError(messages);
+      }
+      const model = parser('matches', response.body);
+      model.extend('rateLimit', response.rateLimit);
+
+      return model;
     } catch (e) {
       return normalizeError(null, e);
     }

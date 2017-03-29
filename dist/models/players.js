@@ -19,69 +19,32 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Match = function (_BaseModel) {
-  _inherits(Match, _BaseModel);
+var Players = function (_BaseModel) {
+  _inherits(Players, _BaseModel);
 
-  function Match(data) {
-    _classCallCheck(this, Match);
+  function Players(data) {
+    _classCallCheck(this, Players);
 
-    var _this = _possibleConstructorReturn(this, (Match.__proto__ || Object.getPrototypeOf(Match)).call(this, data));
+    var _this = _possibleConstructorReturn(this, (Players.__proto__ || Object.getPrototypeOf(Players)).call(this, data));
 
     _this.relationships = [{
-      type: 'rosters'
-    }, {
-      type: 'assets'
+      type: 'player'
     }];
     return _this;
   }
 
-  _createClass(Match, [{
-    key: 'createdAt',
-    get: function get() {
-      return this.data.attributes.createdAt;
-    }
-  }, {
-    key: 'duration',
-    get: function get() {
-      return this.data.attributes.duration;
-    }
-  }, {
-    key: 'gameMode',
-    get: function get() {
-      return this.data.attributes.gameMode;
-    }
-  }, {
-    key: 'patchVersion',
-    get: function get() {
-      return this.data.attributes.patchVersion;
-    }
-  }, {
-    key: 'shardId',
-    get: function get() {
-      return this.data.attributes.shardId;
-    }
-  }, {
-    key: 'stats',
-    get: function get() {
-      return this.data.attributes.stats;
-    }
-  }, {
-    key: 'titleId',
-    get: function get() {
-      return this.data.attributes.titleId;
-    }
-  }, {
-    key: 'rosters',
-    set: function set(rosters) {
-      this.matchRoster = rosters;
+  _createClass(Players, [{
+    key: 'players',
+    set: function set(player) {
+      this.playersPlayer = player;
       return this;
     },
     get: function get() {
-      return this.matchRoster;
+      return this.playersPlayer;
     }
   }]);
 
-  return Match;
+  return Players;
 }(_2.default);
 
-exports.default = Match;
+exports.default = Players;

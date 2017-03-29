@@ -1,12 +1,10 @@
-# Vainglory.js(BETA) - A Javascript API Client for Vainglory
+# Vainglory.js(BETA)
 
 [![Build Status](https://travis-ci.org/seripap/vainglory.svg?branch=master)](https://travis-ci.org/seripap/vainglory) [![npm](https://img.shields.io/npm/v/vainglory.svg)](https://www.npmjs.com/package/vainglory)
 
 **CURRENTLY IN ACTIVE DEVELOPMENT**
 
-This is a Javascript API client for [Vainglory](http://vainglorygame.com).
-
-There will be a lot of updates prior to [v1.0.0](https://github.com/seripap/vainglory/issues/1). If you are using this package, always update to the [latest version](https://github.com/seripap/vainglory/releases) to ensure API alignment and data accuracy.
+This is a Javascript API client wrapper for [Vainglory](http://vainglorygame.com). If you are using this package, always update to the [latest version](https://github.com/seripap/vainglory/releases) to ensure API alignment since the official API is still in Alpha.
 
 If you run into problems or find bugs, [file an issue](https://github.com/seripap/vainglory/issues).
 
@@ -21,11 +19,11 @@ To initalize the library
 
 ```javascript
 import Vainglory from 'vainglory';
-
 const vainglory = new Vainglory('api-key');
 ```
 
 <a name="options" />
+
 ## Options
 
 Base options can be modified by passing an object during initalization.
@@ -38,7 +36,7 @@ __Properties__
 ```javascript
 import Vainglory from 'vainglory';
 
-/* defaults */
+// Defaults
 const options = {
   host: 'https://api.dc01.gamelockerapp.com/shards/',
   region: 'na',
@@ -48,30 +46,24 @@ const options = {
 const vainglory = new Vainglory('api-key', options);
 ```
 
-## Examples
-
-```
-$ yarn run example
-```
-
-## Tests
-
-```
-$ yarn test
-```
-
 <a name="documentation" />
+
 ## Documentation
 
 ### Reference
 
 All methods are named references from the [Official API Reference](http://developer.vainglorygame.com/docs). All methods will return a promise.
 
+* [`Errors`](#errors)
+* [`RateLimits`](#rateLimits)
+* [`Telemetry`](#telemetry)
 * [`status`](#apiStatus)
 * [`region`](#apiRegion)
 * [`setRegion`](#apiSetRegion)
+* [`models`](#apiModels)
 
 ### Matches
+
 * [`collection`](#matchesCollection)
 * [`single`](#matchesSingle)
 
@@ -81,6 +73,7 @@ All methods are named references from the [Official API Reference](http://develo
 * [`getByName`](#playersName)
 
 <a name="errors" />
+
 ### Errors
 
 You can check on the property `.errors` to determine if a response has errored and the [subsequent message that follows](https://developer.vainglorygame.com/docs#errors). `.debug` will provide request and header information.
@@ -103,11 +96,61 @@ __Example__
         'X-TITLE-ID': 'semc-vainglory' 
       } 
     } 
-  }
+  },
+  rateLimit:
+    { limit: '10',
+      remaining: '9',
+      reset: '6000000000',
+      requestId: 'some-arbitrary-id' } 
+    }
+```
+
+<a name="rateLimits" />
+
+### Rate Limits
+
+Rate limit information is attached to every request. All models will return `.rateLimit`, see the [Reference](https://developer.vainglorygame.com/docs#rate-limits) for more information or if you need to increase your rate limit.
+
+```
+  rateLimit:
+    { limit: '10',
+      remaining: '9',
+      reset: '6000000000',
+      requestId: 'some-arbitrary-id' } 
+    }
+```
+
+<a name="telemetry" />
+
+### Telemetry
+
+Telemetry data can be retrieved from the `match` model under assets. Assets is an array of [asset](#assetModel).
+
+__Example__
+
+```javascript
+const matchId = 'f5373c40-0aa9-11e7-bcff-0667892d829e';
+vainglory.matches.single(matchId).then((match) => {
+  console.log(match.assets) // array of asset
+  // If you'd like to resolve telemetry data
+}).catch((err) => console.error(err));
+```
+
+### .resolve()
+
+If you would like to resolve telemetry data, you can call `.resolve()` directly on the asset. Note that this currently returns the raw data that is associated with `.URL`.
+
+```javascript
+const matchId = 'f5373c40-0aa9-11e7-bcff-0667892d829e';
+vainglory.matches.single(matchId).then(async (match) => {
+  const telemetry = await match.assets[0].resolve();
+  console.log(telemetry);
+}).catch((err) => console.error(err));
 ```
 
 ---------------------------------------
 <a name="apiStatus" />
+
 ## Status
 
 `vainglory.status`
@@ -118,7 +161,7 @@ Returns API meta information.
 vainglory.status().then((info) => console.log(info));
 ```
 
-Example Response
+__Example Response__
 
 ```
 { 
@@ -130,6 +173,7 @@ Example Response
 ```
 
 <a name="apiRegion" />
+
 ## region
 
 `vainglory.region`
@@ -143,6 +187,7 @@ vainglory.players... // data from the region that was initialized (defaults to n
 ```
 
 <a name="apiSetRegion" />
+
 ## setRegion
 
 `vainglory.setRegion`
@@ -155,12 +200,29 @@ vainglory.matches... // will return data from `sg` region
 vainglory.players... // will return data from `sg` region
 ```
 
+<a name="apiModels" />
+
+## models
+
+`vainglory.models`
+
+Exposed data models. See mock data in tests to see how data should be referenced.
+
+```javascript
+const match = new vainglory.models.match({data: ...match});
+const matches = new vainglory.models.matches({data: ...matches});
+const player = new vainglory.models.player({data: ...player});
+const participant = new vainglory.models.participant({data: ...participant});
+const roster = new vainglory.models.roster({data: ...roster});
+```
+
 ---------------------------------------
 ## Matches
 
 `vainglory.matches` 
 
 <a name="matchesCollection" />
+
 #### .collection({...options})
 
 Retrieves all matches. [Reference](http://developer.vainglorygame.com/docs/#get-a-collection-of-matches)
@@ -182,8 +244,8 @@ const options = {
   filter: {
     'createdAt-start': minus3Hours.toISOString(), // ISO Date
     'createdAt-end': now.toISOString(), // ISO Date
-    playerNames: [], // Array
-    teamNames: [], // Array
+    playerNames: [],
+    teamNames: [],
   },
 };
 ```
@@ -204,6 +266,7 @@ vainglory.matches.collection(options).then((matches) => {
 ```
 
 <a name="matchesSingle" />
+
 #### .single(matchId)
 
 Retreives a single match by ID. [Reference](http://developer.vainglorygame.com/docs/#get-a-single-match)
@@ -233,9 +296,10 @@ vainglory.matches.single(matchId).then((match) => {
 `vainglory.players` 
 
 <a name="playersId" />
+
 #### getById(playerId)
 
-Retreives a player by playerId. [Reference](http://developer.vainglorygame.com/docs/#get-a-single-player)
+Retreives a **single** player by playerId. [Reference](http://developer.vainglorygame.com/docs/#get-a-single-player)
 
 __Arguments__
 - `playerId` [*String*] - The ID of player to retrieve
@@ -256,21 +320,22 @@ vainglory.players.getById(playerId).then((player) => {
 ```
 
 <a name="playersName" />
-#### getByName(playerName)
 
-Retreives a player by playerName. [Reference](http://developer.vainglorygame.com/docs/#get-a-single-player)
+#### getByName(playerNames)
+
+Retreives players by playerName. [Reference](http://developer.vainglorygame.com/docs/#get-a-single-player)
 
 __Arguments__
-- `playerName` [*String*] - The name of player to retrieve.
+- `playerNames` [*Array*] - The name of players to retrieve. Max length of 6.
 
 __Returns__
-- [Player](#playerModel)
+- [Players](#playersModel)
 
 __Example__
 ```javascript
-const playerName = 'famous';
+const playerNames = ['famous'];
 
-vainglory.players.getByName(playerName).then((player) => {
+vainglory.players.getByName(playerNames).then((player) => {
   if (player.errors) return;
   console.log(player.id);
   console.log(player.stats);
@@ -282,7 +347,7 @@ vainglory.players.getByName(playerName).then((player) => {
 ---------------------------------------
 ## Models
 
-All results are wrapped with a model for easier data digesting. You can request any data that comes back from the request.
+All results are wrapped with its respective data model.
 
 - `.type` - Returns the type of data requested
 - `.id` - Returns associated ID
@@ -293,15 +358,18 @@ All results are wrapped with a model for easier data digesting. You can request 
 For fields in `participant` such as `actor` or `itemGrants`, server will return `*1000_Item_HalcyonPotion*`. The client will return `Halcyon Potion` automatically based on field mappings. If you would like the original response, instead of calling `.stats` directly, use `._stats` or `._actor` instead of `.actor`.
 
 <a name="matchesModel" />
+
 ### Matches
 
 - [`.match`](#matchModel) - Array of Match
 
 <a name="matchModel" />
+
 ### Match
 
 [Ref](https://developer.vainglorygame.com/docs#matches)
 
+- `.assets` - Array of [Asset](#assetModel)
 - `.createdAt`
 - `.duration`
 - `.gameMode`
@@ -311,7 +379,22 @@ For fields in `participant` such as `actor` or `itemGrants`, server will return 
 - `.titleId`
 - `.rosters` - Array of [Roster](#rosterModel)
 
+<a name="assetModel" />
+
+### Asset
+
+[Ref](https://developer.vainglorygame.com/docs#telemetry)
+
+- `.URL`
+- `.contentType`
+- `.createdAt`
+- `.description`
+- `.filename`
+- `.name`
+- `.resolve()` - Returns promise; resolves `.URL` data
+
 <a name="rosterModel" />
+
 ### Roster
 
 [Ref](https://developer.vainglorygame.com/docs#rosters)
@@ -320,6 +403,7 @@ For fields in `participant` such as `actor` or `itemGrants`, server will return 
 - `.participants` - Array of [Participant](#participantModel)
 
 <a name="participantModel" />
+
 ### Participant
 
 [Ref](https://developer.vainglorygame.com/docs#participants)
@@ -330,7 +414,14 @@ For fields in `participant` such as `actor` or `itemGrants`, server will return 
 - `.stats`
 - `.player` - [Player](#playerModel)
 
+<a name="playersModel" />
+
+### Players
+
+- `.player` - Array of [Player](#playerModel)
+
 <a name="playerModel" />
+
 ### Player
 
 - `.name`
